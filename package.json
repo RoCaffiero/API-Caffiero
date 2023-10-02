@@ -1,0 +1,22 @@
+{
+  "name": "api-products",
+  "version": "1.0.0",
+  "description": "microservicio de productos para Coderhouse",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "nodemon index.js"
+  },
+  "author": "Caffiero",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "nodemon": "^3.0.1",
+    "sequelize": "^6.33.0",
+    "sqlite3": "^5.1.6"
+  }
+}
