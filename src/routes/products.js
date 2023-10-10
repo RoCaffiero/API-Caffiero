@@ -5,7 +5,9 @@ const router = Router();
 const {
     getProducts,
     getProductById,
-    addProduct
+    addProduct,
+    deleteProduct,
+    updateProduct
 }=require("../controllers/products");
 
 
@@ -13,6 +15,8 @@ const {
 router.get("/getProducts", getProducts);
 router.get("/getProductById/:id?", getProductById);
 router.post("/addProduct", addProduct);
+router.delete ("/deleteProduct/:id?", deleteProduct);
+router.put("/updateProduct/:id?", updateProduct);
 
 
 module.exports = router;

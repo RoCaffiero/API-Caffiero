@@ -24,7 +24,6 @@ const getProducts = (req, res) => {
         res.header("X-Total-Count", count);
         res.status(200).json(products);
     } catch (error) {
-        console.error("Error al leer o analizar el archivo JSON:", error);
         res.status(500).json({ error: "Error al obtener los productos." });
     }
 };
@@ -40,7 +39,7 @@ const getProductById = (req, res) => {
 
         const products = JSON.parse(jsonData);
 
-        const product = products.find((p) => p.product_id === Number(productId));
+        const product = products.find((p) => p.id === Number(productId));
 
         if (product) {
             res.status(200).json(product);
@@ -48,22 +47,20 @@ const getProductById = (req, res) => {
             res.status(404).json({ error: "Producto no encontrado" });
         }
     } catch (error) {
-        console.error("Error al leer o analizar el archivo JSON:", error);
         res.status(500).json({ error: "Error al obtener el producto por ID." });
     }
 };
 
 const addProduct = (req, res) => {
     try {
-        console.log("Holi");
-        console.log(req.body);
+
         const newProduct = req.body;
 
         const jsonData = fs.readFileSync(jsonFilePath, "utf8");
 
         const products = JSON.parse(jsonData);
 
-        newProduct.product_id = getNextProductId(products);
+        newProduct.id = getNextProductId(products);
 
         products.push(newProduct);
 
@@ -71,26 +68,76 @@ const addProduct = (req, res) => {
 
         res.status(201).json(newProduct);
     } catch (error) {
-        console.error("Error al agregar un producto:", error);
         res.status(500).json({ error: "Error al agregar el producto." });
     }
 };
 
 
 function getNextProductId(products) {
-    const maxProductId = Math.max(...products.map((product) => product.product_id), 0);
+    const maxProductId = Math.max(...products.map((product) => product.id), 0);
     return maxProductId + 1;
 }
 
+const deleteProduct = (req, res) => {
+    try {
+        const productId = req.params.id;
 
-function getNextProductId(products) {
-    const maxProductId = Math.max(...products.map((product) => product.product_id), 0);
-    return maxProductId + 1;
-}
+        const jsonData = fs.readFileSync(jsonFilePath, "utf8");
+
+        let products = JSON.parse(jsonData);
+
+        const productIndex = products.findIndex((p) => p.id === Number(productId));
+
+        if (productIndex !== -1) {
+
+            products.splice(productIndex, 1);
+
+
+            fs.writeFileSync(jsonFilePath, JSON.stringify(products, null, 2), "utf8");
+
+            res.status(200).send({message: `Producto ${productId} eliminado correctamente `});
+        } else {
+            res.status(404).json({ error: "Producto no encontrado" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Error al eliminar el producto." });
+    }
+};
+
+const updateProduct = (req, res) => {
+    try { 
+        const productId = req.params.id;
+        let myProduct= {
+            title: req.body.title,
+            description: req.body.description,
+            price:req.body.price,
+            thumbnail:req.body.thumbnail,
+            code: req.body.code,
+            stock: req.body.stock,
+            id: Number(productId)
+        }
+        const jsonData = fs.readFileSync(jsonFilePath, "utf8");
+        let products = JSON.parse(jsonData);
+       
+        const productIndex = products.findIndex((p) => p.id === Number(productId));
+        if (productIndex !== -1) {
+            products[productIndex] = myProduct;
+            fs.writeFileSync(jsonFilePath, JSON.stringify(products, null, 2), "utf8");
+            res.status(200).json(myProduct);
+        } else {
+            res.status(404).json({ error: "Producto no encontrado" });
+        }
+    } catch (error) {
+        console.error("Error al actualizar el producto:", error);
+        res.status(500).json({ error: "Error al actualizar el producto." });
+    }
+};
+
 
 module.exports = {
     getProducts,
     getProductById,
-    addProduct
+    addProduct,
+    deleteProduct,
+    updateProduct
 };
-
